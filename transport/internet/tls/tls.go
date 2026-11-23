@@ -213,16 +213,16 @@ func copyConfig(c *tls.Config) *utls.Config {
 }
 
 func init() {
-	bigInt, _ := rand.Int(rand.Reader, big.NewInt(int64(len(ModernFingerprints))))
-	stopAt := int(bigInt.Int64())
-	i := 0
-	for _, v := range ModernFingerprints {
-		if i == stopAt {
-			PresetFingerprints["random"] = v
-			break
-		}
-		i++
+	// "random" picks from the three browser auto fingerprints. All three carry
+	// an X25519MLKEM768 key_share, so the selection always satisfies the
+	// upstream REALITY server's key_share requirement.
+	randomCandidates := []*utls.ClientHelloID{
+		&utls.HelloChrome_Auto,
+		&utls.HelloFirefox_Auto,
+		&utls.HelloSafari_Auto,
 	}
+	bigInt, _ := rand.Int(rand.Reader, big.NewInt(int64(len(randomCandidates))))
+	PresetFingerprints["random"] = randomCandidates[int(bigInt.Int64())]
 	weights := utls.DefaultWeights
 	weights.TLSVersMax_Set_VersionTLS13 = 1
 	weights.FirstKeyShare_Set_CurveP256 = 0
@@ -269,7 +269,8 @@ var PresetFingerprints = map[string]*utls.ClientHelloID{
 }
 
 var ModernFingerprints = map[string]*utls.ClientHelloID{
-	// One of these will be chosen as `random` at startup
+	// Named modern browser fingerprints (selectable by name).
+	// Note: "random" is now chosen from three auto fingerprints in init(), not from this map.
 	"hellofirefox_120": &utls.HelloFirefox_120,
 	"hellofirefox_148": &utls.HelloFirefox_148,
 	"hellochrome_120":  &utls.HelloChrome_120,
