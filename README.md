@@ -8,6 +8,7 @@
 - REALITY server 默认 minClientVer: 26.3.27（7/11），并对 apple/icloud 目标或非 443 端口监听发出警告。
 - `allowInsecure` 在 2026-06-01 后被移除：本 fork 永久允许 `allowInsecure`（带 deprecation 警告）。
 - 默认关闭 MPTCP（CVE-2026-98432）。
+- fingerprint=random 现在只会解析到 chrome/firefox/safari auto (全部带 X25519MLKEM768)
 - CI 产物：linux/amd64、linux/arm64、windows/amd64。
 
 # Project X
